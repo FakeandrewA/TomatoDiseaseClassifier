@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title('🎈 Hello Mithun')
+st.title('🎈 Hello world')
 
 def preprocess_img(url):
   # Download an image and preprocess it
