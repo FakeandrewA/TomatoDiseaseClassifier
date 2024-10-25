@@ -18,9 +18,5 @@ with st.chat_message("user"):
     st.line_chart(np.random.randn(30, 3))
 
 # Display a chat input widget at the bottom of the app.
-st.chat_input("Say something")
-
-# Display a chat input widget inline.
-with st.container():
-    st.chat_input("Say something")
-st.write(class_names[0])
+user_input = st.text_input("Say something")
+st.write(user_input)
