@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
-import matplotlib.plot as plt
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 st.title('🎈 Hello world')
 
 def preprocess_img(url):
