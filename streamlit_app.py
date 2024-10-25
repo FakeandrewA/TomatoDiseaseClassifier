@@ -20,7 +20,7 @@ with st.chat_message("user"):
 # Display a chat input widget at the bottom of the app.
 st.chat_input("Say something")
 
-# Display a chat input widget inline.
-with st.container():
-    st.chat_input("Say something")
+# # Display a chat input widget inline.
+# with st.container():
+#     st.chat_input("Say something")
 st.write(class_names[0])
