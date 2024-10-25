@@ -31,8 +31,9 @@ print(class_names[0])
 st.write('Hello world!')
 
 # Display a chat input widget at the bottom of the app.
-
-preprocess_and_display_image(st.text_input("Say something"))
+u=st.text_input("Say something");
+if(u):
+ preprocess_and_display_image(u)
 
 
 
