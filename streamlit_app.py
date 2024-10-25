@@ -31,9 +31,8 @@ print(class_names[0])
 st.write('Hello world!')
 
 # Display a chat input widget at the bottom of the app.
-user_input = st.text_input("Say something")
-image_url = "https://www.easygifanimator.net/images/samples/video-to-gif-sample.gif"  # Replace with your image URL
-preprocess_and_display_image(image_url)
+
+preprocess_and_display_image(st.text_input("Say something"))
 
 
 
