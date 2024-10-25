@@ -17,5 +17,9 @@ st.write('Hello world!')
 
 # Display a chat input widget at the bottom of the app.
 user_input = st.text_input("Say something")
-st.write(user_input)
+img = preprocess_img(user_input)
+plt.imshow(img)
+plt.title("Your Image")
+plt.axis("off")
+
 
