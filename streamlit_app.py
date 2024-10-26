@@ -3,20 +3,13 @@ import numpy as np
 import tensorflow as tf
 import gdown
 import os
+import zipfile
 
 st.title('🎈 Hello World')
 
-# Import required modules
-import matplotlib.pyplot as plt
-import tensorflow as tf
-
 # Function to download, preprocess, and display an image from a URL
 def preprocess_and_display_image(image_url):
-    """Downloads, preprocesses, and displays an image from a URL in Streamlit.
-
-    Args:
-        image_url: The URL of the image.
-    """
+    """Downloads, preprocesses, and displays an image from a URL in Streamlit."""
     try:
         # Download the image.
         image_path = tf.keras.utils.get_file(origin=image_url)
@@ -40,25 +33,32 @@ class_names = [
     'Tomato___healthy'
 ]
 
-# Step 1: Define your Google Drive file ID and download path
-file_id = '1LnvMfTLyMJWkDG2QS3P8ejMmMkJM4_8c'  # Extracted from your link
-model_path = 'Resnet_model'  # Folder name to store the model
+# Google Drive file ID and download path
+file_id = '14M4lfoNrQb3j3z0ggBYPP7q8KjvCghwu'  # File ID of the zip file
+zip_path = 'model.zip'
+extracted_model_path = 'downloaded_model'  # Folder name to store the extracted model
 
-# Step 2: Download the model from Google Drive
-def download_model(file_id, model_path):
+# Download and extract the model zip file
+def download_and_extract_model(file_id, zip_path, extracted_path):
     url = f'https://drive.google.com/uc?id={file_id}'
-    gdown.download_folder(url, quiet=False, output=model_path, use_cookies=False)
+    
+    # Download the zip file
+    gdown.download(url, zip_path, quiet=False)
+    
+    # Extract the zip file
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extracted_path)
 
-# Ensure the model directory exists
-os.makedirs(model_path, exist_ok=True)
+# Ensure the extracted model directory exists
+os.makedirs(extracted_model_path, exist_ok=True)
 
-# Download if not already downloaded
-if not os.listdir(model_path):  # Check if the directory is empty
-    download_model(file_id, model_path)
+# Download and extract if not already done
+if not os.listdir(extracted_model_path):  # Check if the directory is empty
+    download_and_extract_model(file_id, zip_path, extracted_model_path)
 
 # Load the SavedModel using tf.saved_model.load
 try:
-    model = tf.saved_model.load(model_path)
+    model = tf.saved_model.load(extracted_model_path)
 except Exception as e:
     st.error(f"Error loading the model: {e}")
 
