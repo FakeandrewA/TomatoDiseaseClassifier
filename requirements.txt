@@ -4,4 +4,3 @@ lime
 matplotlib
 numpy
 gdown
-zipfile>=13.5
