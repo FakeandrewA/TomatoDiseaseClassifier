@@ -4,10 +4,7 @@ import tensorflow as tf
 import gdown
 import os
 import zipfile
-import matplotlib.pyplot as plt
 from PIL import Image
-import requests
-from io import BytesIO  # Import BytesIO for handling byte data
 
 st.title('🎈 Tomato Leaf Disease Prediction App')
 
@@ -15,21 +12,16 @@ st.title('🎈 Tomato Leaf Disease Prediction App')
 def preprocess_img(url):
     try:
         # Download the image from the URL
-        response = requests.get(url)
+        image_path = tf.keras.utils.get_file(origin=url)
         
-        # Check if the request was successful
-        if response.status_code != 200:
-            st.error(f"Failed to download image. Status code: {response.status_code}")
-            return None, None
-        
-        # Try to open the image
-        img = Image.open(BytesIO(response.content)).convert('RGB')
+        # Open the image and convert to RGB
+        img = Image.open(image_path).convert('RGB')
         img = img.resize((244, 244))  # Resize to match model input
         img_array = tf.keras.preprocessing.image.img_to_array(img)
         return img_array
     except Exception as e:
         st.error(f"Error processing image: {e}")
-        return None, None
+        return None
 
 class_names = [
     'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight', 
