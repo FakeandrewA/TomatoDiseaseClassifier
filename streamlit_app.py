@@ -81,4 +81,17 @@ if st.button("Predict"):
     if image_url:
         predicted_class, processed_image = predict(model, image_url)
 
-        # D
+        # Display the processed image
+        if processed_image is not None:
+            # Convert tensor to numpy array and ensure it's in the correct range
+            processed_image = processed_image.numpy()
+            processed_image = np.clip(processed_image, 0.0, 1.0)  # Ensure the values are within [0, 1]
+            st.image(processed_image, caption='Processed Image', use_column_width=True)
+
+        # Display the prediction result
+        if predicted_class is not None:
+            st.write(f"Predicted class: {predicted_class}")
+    else:
+        st.error("Please enter a valid image URL.")
+
+st.write('Hello World!')
