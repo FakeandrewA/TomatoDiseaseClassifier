@@ -62,7 +62,7 @@ def predict(model, url):
     if img is None:
         return None, None  # Return if image processing fails
 
-    img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # Convert to float32
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # Convert to float32 and normalize
     img = tf.expand_dims(img, axis=0)  # Add batch dimension
 
     pred_probs = model(img)  # Use the model to predict
@@ -73,7 +73,7 @@ def predict(model, url):
     else:
         predicted_class = "Unknown"
 
-    return predicted_class, img[0]  # Return the class name and the image array
+    return predicted_class, img[0]  # Return the class name and the image tensor
 
 # Streamlit app for user input
 image_url = st.text_input("Enter image URL to process:")
@@ -81,14 +81,4 @@ if st.button("Predict"):
     if image_url:
         predicted_class, processed_image = predict(model, image_url)
 
-        # Display the processed image
-        if processed_image is not None:
-            st.image(processed_image.numpy(), caption='Processed Image', use_column_width=True)
-
-        # Display the prediction result
-        if predicted_class is not None:
-            st.write(f"Predicted class: {predicted_class}")
-    else:
-        st.error("Please enter a valid image URL.")
-
-st.write('Hello World!')
+        # D
