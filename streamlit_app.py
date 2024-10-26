@@ -42,7 +42,7 @@ class_names = [
 
 # Step 1: Define your Google Drive file ID and download path
 file_id = '1LnvMfTLyMJWkDG2QS3P8ejMmMkJM4_8c'  # Extracted from your link
-model_path = 'downloaded_model'  # Folder name to store the model
+model_path = 'Resnet_model'  # Folder name to store the model
 
 # Step 2: Download the model from Google Drive
 def download_model(file_id, model_path):
