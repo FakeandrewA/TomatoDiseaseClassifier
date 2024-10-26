@@ -12,16 +12,24 @@ from io import BytesIO  # Import BytesIO for handling byte data
 st.title('🎈 Tomato Leaf Disease Prediction App')
 
 # Function to download, preprocess, and display an image from a URL
-def preprocess_img(url, label):
+def preprocess_img(url):
     try:
         # Download the image from the URL
         response = requests.get(url)
+        
+        # Check if the request was successful
+        if response.status_code != 200:
+            st.error(f"Failed to download image. Status code: {response.status_code}")
+            return None, None
+        
+        # Try to open the image
         img = Image.open(BytesIO(response.content)).convert('RGB')
         img = img.resize((244, 244))  # Resize to match model input
         img_array = tf.keras.preprocessing.image.img_to_array(img)
-        return img_array, label
+        return img_array
     except Exception as e:
         st.error(f"Error processing image: {e}")
+        return None, None
 
 class_names = [
     'Tomato___Bacterial_spot', 'Tomato___Early_blight', 'Tomato___Late_blight', 
@@ -55,7 +63,10 @@ except Exception as e:
     st.error(f"Error loading the model: {e}")
 
 def predict(model, url):
-    img, _ = preprocess_img(url, None)  # No label needed for prediction
+    img = preprocess_img(url)  # No label needed for prediction
+    if img is None:
+        return None, None  # Return if image processing fails
+
     img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # Convert to float32
     img = tf.expand_dims(img, axis=0)  # Add batch dimension
 
@@ -76,10 +87,12 @@ if st.button("Predict"):
         predicted_class, processed_image = predict(model, image_url)
 
         # Display the processed image
-        st.image(processed_image.numpy(), caption='Processed Image', use_column_width=True)
+        if processed_image is not None:
+            st.image(processed_image.numpy(), caption='Processed Image', use_column_width=True)
 
         # Display the prediction result
-        st.write(f"Predicted class: {predicted_class}")
+        if predicted_class is not None:
+            st.write(f"Predicted class: {predicted_class}")
     else:
         st.error("Please enter a valid image URL.")
 
