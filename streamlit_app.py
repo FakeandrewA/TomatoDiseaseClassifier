@@ -64,16 +64,20 @@ def predict(model, url):
     if img is None:
         return None, None  # Return if image processing fails
 
-    img = tf.convert_to_tensor(img)  # Convert to tensor
+    img = tf.convert_to_tensor(img, dtype=tf.float32)  # Convert to tensor
     img = tf.expand_dims(img, axis=0)  # Add batch dimension
 
-    pred_probs = model(img)  # Use the model to predict
-    predicted_class_index = tf.argmax(pred_probs[0]).numpy()
-
-    if 0 <= predicted_class_index < len(class_names):
-        predicted_class = class_names[predicted_class_index]
-    else:
-        predicted_class = "Unknown"
+    try:
+        pred_probs = model(img)  # Use the model to predict
+        predicted_class_index = tf.argmax(pred_probs[0]).numpy()
+        
+        if 0 <= predicted_class_index < len(class_names):
+            predicted_class = class_names[predicted_class_index]
+        else:
+            predicted_class = "Unknown"
+    except ValueError as e:
+        st.error(f"Model prediction error: {e}")
+        predicted_class = None
 
     return predicted_class, img[0]  # Return the class name and the image tensor
 
