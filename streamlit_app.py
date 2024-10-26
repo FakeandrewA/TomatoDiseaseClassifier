@@ -28,7 +28,7 @@ class_names = [
 
 file_id = '14M4lfoNrQb3j3z0ggBYPP7q8KjvCghwu'
 zip_path = 'model.zip'
-extracted_model_path = 'downloaded_model/model'  # Adjusted path to match the extracted model structure
+extracted_model_path = 'downloaded_model/model/Resnet_model'  # Updated to point to Resnet_model
 
 def download_and_extract_model(file_id, zip_path, extracted_path):
     url = f'https://drive.google.com/uc?id={file_id}'
@@ -61,8 +61,8 @@ user_input = st.text_input("Enter input for prediction:")
 
 if st.button("Predict"):
     try:
-        # Adjust this according to your model's input requirements
-        prediction = model.predict([user_input])
+        # Ensure user input is formatted correctly for your model
+        prediction = model.predict([user_input])  # Adjust this according to your model's input requirements
         st.write(f"Prediction: {prediction}")
     except Exception as e:
         st.error(f"Error during prediction: {e}")
