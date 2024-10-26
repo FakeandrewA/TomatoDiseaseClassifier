@@ -4,17 +4,21 @@ import tensorflow as tf
 import gdown
 import os
 import zipfile
+import matplotlib.pyplot as plt
+from PIL import Image
+import requests
 
-st.title('🎈 Hello World')
+st.title('🎈 Tomato Leaf Disease Prediction App')
 
 # Function to download, preprocess, and display an image from a URL
-def preprocess_and_display_image(image_url):
+def preprocess_img(url, label):
     try:
-        image_path = tf.keras.utils.get_file(origin=image_url)
-        image = tf.keras.preprocessing.image.load_img(image_path)
-        image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-        image = tf.image.resize(image, [224, 224])
-        st.image(image.numpy(), caption='Processed Image', use_column_width=True)
+        # Download the image from the URL
+        response = requests.get(url)
+        img = Image.open(BytesIO(response.content)).convert('RGB')
+        img = img.resize((244, 244))  # Resize to match model input
+        img_array = tf.keras.preprocessing.image.img_to_array(img)
+        return img_array, label
     except Exception as e:
         st.error(f"Error processing image: {e}")
 
@@ -28,7 +32,7 @@ class_names = [
 
 file_id = '14M4lfoNrQb3j3z0ggBYPP7q8KjvCghwu'
 zip_path = 'model.zip'
-extracted_model_path = 'downloaded_model/model/Resnet_model'  # Updated to point to Resnet_model
+extracted_model_path = 'downloaded_model/model/Resnet_model'  # Adjusted path
 
 def download_and_extract_model(file_id, zip_path, extracted_path):
     url = f'https://drive.google.com/uc?id={file_id}'
@@ -41,13 +45,7 @@ os.makedirs(extracted_model_path, exist_ok=True)
 if not os.listdir(extracted_model_path):
     download_and_extract_model(file_id, zip_path, extracted_model_path)
 
-# List contents of the extracted model directory for debugging
-st.write("Contents of the extracted model directory:")
-for root, dirs, files in os.walk(extracted_model_path):
-    for file in files:
-        st.write(os.path.join(root, file))
-
-# Load the SavedModel using tf.saved_model.load
+# Load the SavedModel
 try:
     load_options = tf.saved_model.LoadOptions(experimental_io_device='/job:localhost')
     model = tf.saved_model.load(extracted_model_path, options=load_options)
@@ -55,21 +53,33 @@ try:
 except Exception as e:
     st.error(f"Error loading the model: {e}")
 
-# Streamlit app for predictions
-st.title("Prediction App")
-user_input = st.text_input("Enter input for prediction:")
+def predict(model, url):
+    img, _ = preprocess_img(url, None)  # No label needed for prediction
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # Convert to float32
+    img = tf.expand_dims(img, axis=0)  # Add batch dimension
 
-if st.button("Predict"):
-    try:
-        # Ensure user input is formatted correctly for your model
-        prediction = model.predict([user_input])  # Adjust this according to your model's input requirements
-        st.write(f"Prediction: {prediction}")
-    except Exception as e:
-        st.error(f"Error during prediction: {e}")
+    pred_probs = model(img)  # Use the model to predict
+    predicted_class_index = tf.argmax(pred_probs[0]).numpy()
 
-# Additional Input for URL to process images
+    if 0 <= predicted_class_index < len(class_names):
+        predicted_class = class_names[predicted_class_index]
+    else:
+        predicted_class = "Unknown"
+
+    return predicted_class, img[0]  # Return the class name and the image array
+
+# Streamlit app for user input
 image_url = st.text_input("Enter image URL to process:")
-if image_url:
-    preprocess_and_display_image(image_url)
+if st.button("Predict"):
+    if image_url:
+        predicted_class, processed_image = predict(model, image_url)
+
+        # Display the processed image
+        st.image(processed_image.numpy(), caption='Processed Image', use_column_width=True)
+
+        # Display the prediction result
+        st.write(f"Predicted class: {predicted_class}")
+    else:
+        st.error("Please enter a valid image URL.")
 
 st.write('Hello World!')
