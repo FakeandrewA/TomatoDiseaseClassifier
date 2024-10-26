@@ -56,9 +56,16 @@ os.makedirs(extracted_model_path, exist_ok=True)
 if not os.listdir(extracted_model_path):  # Check if the directory is empty
     download_and_extract_model(file_id, zip_path, extracted_model_path)
 
+# List contents of the extracted model directory for debugging
+st.write("Contents of the extracted model directory:")
+for root, dirs, files in os.walk(extracted_model_path):
+    for file in files:
+        st.write(os.path.join(root, file))
+
 # Load the SavedModel using tf.saved_model.load
 try:
-    model = tf.saved_model.load(extracted_model_path)
+    load_options = tf.saved_model.LoadOptions(experimental_io_device='/job:localhost')
+    model = tf.saved_model.load(extracted_model_path, options=load_options)
 except Exception as e:
     st.error(f"Error loading the model: {e}")
 
@@ -68,6 +75,7 @@ user_input = st.text_input("Enter input for prediction:")
 
 if st.button("Predict"):
     try:
+        # Ensure user input is formatted correctly for your model
         prediction = model.predict([user_input])  # Adjust this according to your model's input requirements
         st.write(f"Prediction: {prediction}")
     except Exception as e:
