@@ -20,7 +20,9 @@ def preprocess_img(url):
         # Open the image and convert to RGB
         img = Image.open(io.BytesIO(response.content)).convert('RGB')
         img = img.resize((244, 244))  # Resize to match model input
-        img_array = tf.keras.preprocessing.image.img_to_array(img)
+
+        # Convert the image to a numpy array and normalize to [0, 1]
+        img_array = np.array(img) / 255.0  # Normalize pixel values to [0, 1]
         return img_array
     except Exception as e:
         st.error(f"Error processing image: {e}")
@@ -62,7 +64,7 @@ def predict(model, url):
     if img is None:
         return None, None  # Return if image processing fails
 
-    img = tf.image.convert_image_dtype(img, dtype=tf.float32)  # Convert to float32 and normalize
+    img = tf.convert_to_tensor(img)  # Convert to tensor
     img = tf.expand_dims(img, axis=0)  # Add batch dimension
 
     pred_probs = model(img)  # Use the model to predict
@@ -85,7 +87,6 @@ if st.button("Predict"):
         if processed_image is not None:
             # Convert tensor to numpy array and ensure it's in the correct range
             processed_image = processed_image.numpy()
-            processed_image = np.clip(processed_image, 0.0, 1.0)  # Ensure the values are within [0, 1]
             st.image(processed_image, caption='Processed Image', use_column_width=True)
 
         # Display the prediction result
