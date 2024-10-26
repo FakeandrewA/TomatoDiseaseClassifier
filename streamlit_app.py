@@ -7,6 +7,7 @@ import zipfile
 import matplotlib.pyplot as plt
 from PIL import Image
 import requests
+from io import BytesIO  # Import BytesIO for handling byte data
 
 st.title('🎈 Tomato Leaf Disease Prediction App')
 
