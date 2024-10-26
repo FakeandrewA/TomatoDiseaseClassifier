@@ -4,18 +4,21 @@ import tensorflow as tf
 import gdown
 import os
 import zipfile
+import requests
 from PIL import Image
+import io
 
 st.title('🎈 Tomato Leaf Disease Prediction App')
 
 # Function to download, preprocess, and display an image from a URL
 def preprocess_img(url):
     try:
-        # Download the image from the URL
-        image_path = tf.keras.utils.get_file(origin=url)
+        # Fetch the image from the URL
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad responses (4xx and 5xx)
         
         # Open the image and convert to RGB
-        img = Image.open(image_path).convert('RGB')
+        img = Image.open(io.BytesIO(response.content)).convert('RGB')
         img = img.resize((244, 244))  # Resize to match model input
         img_array = tf.keras.preprocessing.image.img_to_array(img)
         return img_array
