@@ -41,24 +41,25 @@ class_names = [
 ]
 
 # Step 1: Define your Google Drive file ID and download path
-file_id = '1LnvMfTLyMJWkDG2QS3P8ejMmMkJM4_8c'  # Extracted from your link
-model_path = 'Resnet_model'  # Folder name to store the model
+file_id = '1-9iBjWjRcRSJ4qI5K5-4OKs67uIt14jn'  # Your Google Drive file ID
+model_dir = 'downloaded_model'  # Directory to store the model
+model_file = os.path.join(model_dir, 'saved_model.pb')  # Path to the downloaded file
 
-# Step 2: Download the model from Google Drive
-def download_model(file_id, model_path):
+# Step 2: Download the model file from Google Drive
+def download_model(file_id, model_file):
     url = f'https://drive.google.com/uc?id={file_id}'
-    gdown.download_folder(url, quiet=False, output=model_path, use_cookies=False)
+    gdown.download(url, model_file, quiet=False)
 
 # Ensure the model directory exists
-os.makedirs(model_path, exist_ok=True)
+os.makedirs(model_dir, exist_ok=True)
 
 # Download if not already downloaded
-if not os.listdir(model_path):  # Check if the directory is empty
-    download_model(file_id, model_path)
+if not os.path.exists(model_file):  # Check if the model file exists
+    download_model(file_id, model_file)
 
 # Load the SavedModel using tf.saved_model.load
 try:
-    model = tf.saved_model.load(model_path)
+    model = tf.saved_model.load(model_dir)  # Ensure to provide the directory containing 'saved_model.pb'
 except Exception as e:
     st.error(f"Error loading the model: {e}")
 
@@ -72,10 +73,3 @@ if st.button("Predict"):
         st.write(f"Prediction: {prediction}")
     except Exception as e:
         st.error(f"Error during prediction: {e}")
-
-# Additional Input for URL to process images
-image_url = st.text_input("Enter image URL to process:")
-if image_url:
-    preprocess_and_display_image(image_url)
-
-st.write('Hello World!')
