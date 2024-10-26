@@ -86,7 +86,7 @@ if st.button("Predict"):
         # Display the processed image
         if processed_image is not None:
             # Convert tensor to numpy array and ensure it's in the correct range
-            processed_image = processed_image.numpy()
+            processed_image = (processed_image.numpy() * 255).astype(np.uint8)  # Convert back to uint8
             st.image(processed_image, caption='Processed Image', use_column_width=True)
 
         # Display the prediction result
